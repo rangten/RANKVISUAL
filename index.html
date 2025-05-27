@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RankML - Ranking de Anúncios Mercado Livre</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ml-yellow': '#FFE600',
+            'ml-blue': '#2D3277',
+            'ml-light-blue': '#3483FA',
+          },
+          fontFamily: {
+            'sans': ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-white font-sans text-gray-800">
+  <div class="max-w-4xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-ml-blue mb-6">RankML - Ranking de Anúncios</h1>
+
+    <!-- Busca Ranking -->
+    <div class="mb-10">
+      <label class="block font-semibold mb-2" for="busca">Digite o produto para ranking (ex: processador manual):</label>
+      <div class="flex gap-2">
+        <input id="busca" type="text" class="border border-gray-300 rounded px-4 py-2 w-full" />
+        <button onclick="buscarRanking()" class="bg-ml-light-blue text-white px-4 py-2 rounded">Buscar Ranking</button>
+      </div>
+    </div>
+
+    <!-- Posição do seu Anúncio -->
+    <div class="mb-10">
+      <label class="block font-semibold mb-2" for="anuncio">Cole o link ou ID do seu anúncio:</label>
+      <div class="flex gap-2">
+        <input id="anuncio" type="text" class="border border-gray-300 rounded px-4 py-2 w-full" />
+        <button onclick="buscarPosicao()" class="bg-ml-blue text-white px-4 py-2 rounded">Ver Posição</button>
+      </div>
+    </div>
+
+    <!-- Resultados -->
+    <div id="resultado" class="overflow-x-auto"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
