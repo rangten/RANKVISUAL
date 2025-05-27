@@ -1,55 +1,53 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RankML - Ranking de Anúncios Mercado Livre</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'ml-yellow': '#FFE600',
-            'ml-blue': '#2D3277',
-            'ml-light-blue': '#3483FA',
-          },
-          fontFamily: {
-            'sans': ['Inter', 'sans-serif'],
-          },
-        },
-      },
-    };
-  </script>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>RankML - Ranking de Anúncios</title>
+    <script>
+        async function buscarRanking() {
+            const termo = document.getElementById('produto').value;
+            try {
+                const res = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${encodeURIComponent(termo)}`);
+                const data = await res.json();
+                const results = data.results;
+                let html = '<h3>Top 10 Anúncios</h3><ol>';
+                results.slice(0, 10).forEach(item => {
+                    html += `<li>${item.title} - R$ ${item.price}</li>`;
+                });
+                html += '</ol>';
+                document.getElementById('output').innerHTML = html;
+            } catch (error) {
+                document.getElementById('output').innerText = 'Erro ao buscar: ' + error.message;
+            }
+        }
+
+        async function verPosicao() {
+            const termo = document.getElementById('produto').value;
+            const url = document.getElementById('url').value;
+            try {
+                const res = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${encodeURIComponent(termo)}`);
+                const data = await res.json();
+                const results = data.results;
+                const match = results.findIndex(item => url.includes(item.id));
+                document.getElementById('output').innerText = match >= 0 ? `Seu anúncio está na posição ${match + 1}` : 'Anúncio não encontrado nas primeiras 50 posições.';
+            } catch (error) {
+                document.getElementById('output').innerText = 'Erro ao verificar posição: ' + error.message;
+            }
+        }
+    </script>
 </head>
-<body class="bg-white font-sans text-gray-800">
-  <div class="max-w-4xl mx-auto py-10 px-4">
-    <h1 class="text-3xl font-bold text-ml-blue mb-6">RankML - Ranking de Anúncios</h1>
+<body style="font-family:sans-serif; padding:20px;">
+    <h1>RankML - Ranking de Anúncios</h1>
+    <label>Digite o produto para ranking:</label><br>
+    <input type="text" id="produto" style="width:300px;"><br><br>
 
-    <!-- Busca Ranking -->
-    <div class="mb-10">
-      <label class="block font-semibold mb-2" for="busca">Digite o produto para ranking (ex: processador manual):</label>
-      <div class="flex gap-2">
-        <input id="busca" type="text" class="border border-gray-300 rounded px-4 py-2 w-full" />
-        <button onclick="buscarRanking()" class="bg-ml-light-blue text-white px-4 py-2 rounded">Buscar Ranking</button>
-      </div>
-    </div>
+    <label>Cole o link ou ID do seu anúncio:</label><br>
+    <input type="text" id="url" style="width:300px;"><br><br>
 
-    <!-- Posição do seu Anúncio -->
-    <div class="mb-10">
-      <label class="block font-semibold mb-2" for="anuncio">Cole o link ou ID do seu anúncio:</label>
-      <div class="flex gap-2">
-        <input id="anuncio" type="text" class="border border-gray-300 rounded px-4 py-2 w-full" />
-        <button onclick="buscarPosicao()" class="bg-ml-blue text-white px-4 py-2 rounded">Ver Posição</button>
-      </div>
-    </div>
-
-    <!-- Resultados -->
-    <div id="resultado" class="overflow-x-auto"></div>
-  </div>
-
-  <script src="script.js"></script>
+    <button onclick="buscarRanking()">Buscar Ranking</button>
+    <button onclick="verPosicao()">Ver Posição</button>
+    <hr>
+    <div id="output" style="margin-top:20px;"></div>
 </body>
 </html>
