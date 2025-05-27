@@ -2,52 +2,45 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>RankML - Ranking de Anúncios</title>
-    <script>
-        async function buscarRanking() {
-            const termo = document.getElementById('produto').value;
-            try {
-                const res = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${encodeURIComponent(termo)}`);
-                const data = await res.json();
-                const results = data.results;
-                let html = '<h3>Top 10 Anúncios</h3><ol>';
-                results.slice(0, 10).forEach(item => {
-                    html += `<li>${item.title} - R$ ${item.price}</li>`;
-                });
-                html += '</ol>';
-                document.getElementById('output').innerHTML = html;
-            } catch (error) {
-                document.getElementById('output').innerText = 'Erro ao buscar: ' + error.message;
-            }
-        }
-
-        async function verPosicao() {
-            const termo = document.getElementById('produto').value;
-            const url = document.getElementById('url').value;
-            try {
-                const res = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${encodeURIComponent(termo)}`);
-                const data = await res.json();
-                const results = data.results;
-                const match = results.findIndex(item => url.includes(item.id));
-                document.getElementById('output').innerText = match >= 0 ? `Seu anúncio está na posição ${match + 1}` : 'Anúncio não encontrado nas primeiras 50 posições.';
-            } catch (error) {
-                document.getElementById('output').innerText = 'Erro ao verificar posição: ' + error.message;
-            }
-        }
-    </script>
+  <meta charset="UTF-8">
+  <title>RankML - Ranking de Anúncios</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body style="font-family:sans-serif; padding:20px;">
-    <h1>RankML - Ranking de Anúncios</h1>
-    <label>Digite o produto para ranking:</label><br>
-    <input type="text" id="produto" style="width:300px;"><br><br>
+<body class="bg-gray-100 font-sans">
+  <div class="max-w-2xl mx-auto p-6 bg-white shadow-md mt-10 rounded-lg">
+    <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">RankML - Ranking de Anúncios</h1>
+    
+    <label class="block mb-2 font-semibold">Digite o produto para ranking:</label>
+    <input id="searchTerm" type="text" placeholder="ex: GARRAFA TERMICA"
+           class="w-full p-2 mb-4 border border-gray-300 rounded"/>
 
-    <label>Cole o link ou ID do seu anúncio:</label><br>
-    <input type="text" id="url" style="width:300px;"><br><br>
+    <label class="block mb-2 font-semibold">Cole o link ou ID do seu anúncio:</label>
+    <input id="anuncioURL" type="text" placeholder="https://produto.mercadolivre.com.br/MLB-..." 
+           class="w-full p-2 mb-4 border border-gray-300 rounded"/>
 
-    <button onclick="buscarRanking()">Buscar Ranking</button>
-    <button onclick="verPosicao()">Ver Posição</button>
-    <hr>
-    <div id="output" style="margin-top:20px;"></div>
+    <div class="flex gap-4 mb-4">
+      <button onclick="buscarRanking()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Buscar Ranking</button>
+      <button onclick="verPosicao()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Ver Posição</button>
+    </div>
+
+    <pre id="resultado" class="text-sm bg-gray-100 p-4 rounded overflow-x-auto"></pre>
+  </div>
+
+  <script>
+    async function buscarRanking() {
+      const termo = document.getElementById('searchTerm').value;
+      const res = await fetch(`/ranking?termo=${encodeURIComponent(termo)}`);
+      const data = await res.json();
+      document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function verPosicao() {
+      const termo = document.getElementById('searchTerm').value;
+      const url = document.getElementById('anuncioURL').value;
+      const res = await fetch(`/posicao?termo=${encodeURIComponent(termo)}&url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
 </body>
 </html>
