@@ -1,0 +1,13 @@
+
+{
+  "name": "rankvisual",
+  "version": "1.0.0",
+  "description": "Visualizador de ranking de anúncios Mercado Livre",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
