@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ranking de Anúncios (Top 50)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { text-align: center; }
+    .search-box { text-align: center; margin-bottom: 20px; }
+    .search-box input { padding: 8px; width: 300px; font-size: 16px; }
+    .search-box button { padding: 8px 12px; font-size: 16px; background: green; color: white; border: none; cursor: pointer; }
+    .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card { border: 1px solid #ccc; padding: 16px; border-radius: 8px; background: #f9f9f9; }
+    .card img { width: 100%; height: auto; border-radius: 4px; }
+    .card h3 { margin-top: 12px; margin-bottom: 4px; }
+    .card p { margin: 4px 0; }
+    .card a { display: inline-block; margin-top: 8px; color: blue; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Ranking de Anúncios (Top 50)</h1>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Digite o nome do produto" />
+    <button onclick="buscarRanking()">Buscar Ranking</button>
+  </div>
+  <div id="results" class="results"></div>
+
+  <script>
+    async function buscarRanking() {
+      const query = document.getElementById('searchInput').value;
+      const container = document.getElementById('results');
+      container.innerHTML = '<p>Buscando...</p>';
+
+      try {
+        const response = await fetch(`https://rank-api-1.onrender.com/top50?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        if (!data.resultado || data.resultado.length === 0) {
+          container.innerHTML = '<p>Nenhum resultado encontrado.</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        data.resultado.forEach((item, index) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${item.imagem}" alt="Imagem ${index + 1}" />
+            <h3>${index + 1}º - ${item.titulo}</h3>
+            <p><strong>Preço:</strong> ${item.preco}</p>
+            <p><strong>Vendas:</strong> ${item.vendas}</p>
+            <p><strong>Tipo:</strong> ${item.tipo} | <strong>Entrega:</strong> ${item.entrega}</p>
+            <p><strong>Catálogo:</strong> ${item.catalogo} | <strong>Medalha:</strong> ${item.medalha}</p>
+            <p><strong>Vendedor:</strong> ${item.vendedor}</p>
+            <p><strong>Criado em:</strong> ${item.data}</p>
+            <a href="${item.link}" target="_blank">Ver anúncio</a>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        container.innerHTML = '<p>Erro ao buscar dados.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
