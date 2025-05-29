@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking de Anúncios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f2f2f2;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .resultados {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 10px rgba(0,0,0,0.1);
+            width: 300px;
+            box-sizing: border-box;
+        }
+        .card img {
+            max-width: 100%;
+            height: 160px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        .card a {
+            text-decoration: none;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ranking de Anúncios (Top 50)</h1>
+    <input type="text" id="busca" placeholder="Digite um produto" />
+    <button onclick="buscar()">Buscar Ranking</button>
+    <div id="status"></div>
+    <div class="resultados" id="resultados"></div>
+
+    <script>
+    async function buscar() {
+        const termo = document.getElementById("busca").value.trim();
+        const status = document.getElementById("status");
+        const container = document.getElementById("resultados");
+
+        status.innerText = "Buscando ranking para: " + termo;
+        container.innerHTML = "";
+
+        try {
+            const raw = await fetch("https://rankvisual1-api.onrender.com/api/rank?q=" + encodeURIComponent(termo));
+            const dados = await raw.json();
+
+            dados.forEach((anuncio, i) => {
+                const div = document.createElement("div");
+                div.className = "card";
+                div.innerHTML = `
+                    <strong>${i+1}º - ${anuncio.nome}</strong><br>
+                    <img src="${anuncio.imagem}" alt="Imagem do produto"><br>
+                    <strong>Preço:</strong> R$ ${anuncio.preco} <br>
+                    <strong>Vendas:</strong> ${anuncio.vendas} <br>
+                    <strong>Tipo:</strong> ${anuncio.tipo} <br>
+                    <strong>Entrega:</strong> ${anuncio.entrega} <br>
+                    <strong>Catálogo:</strong> ${anuncio.catalogo} <br>
+                    <strong>Medalha:</strong> ${anuncio.medalha} <br>
+                    <a href="${anuncio.link}" target="_blank">Ver anúncio</a>
+                `;
+                container.appendChild(div);
+            });
+        } catch (e) {
+            status.innerText = "Erro ao buscar os dados.";
+        }
+    }
+    </script>
+</body>
+</html>
