@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ranking de Anúncios</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f2f2f2; }
+    h1 { color: #333; }
+    input, button { padding: 10px; margin: 5px 0; font-size: 16px; }
+    .resultados { display: flex; flex-wrap: wrap; gap: 20px; }
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 15px;
+      width: calc(33.33% - 20px);
+      box-sizing: border-box;
+    }
+    .card img {
+      width: 100%;
+      max-height: 160px;
+      object-fit: contain;
+      border-radius: 5px;
+    }
+    a { text-decoration: none; color: blue; }
+  </style>
+</head>
+<body>
+  <h1>Ranking de Anúncios (Top 50)</h1>
+  <input type="text" id="busca" placeholder="Digite um produto" />
+  <button onclick="buscar()">Buscar Ranking</button>
+  <div id="status"></div>
+  <div class="resultados" id="resultados"></div>
+
+  <script>
+    async function buscar() {
+      const termo = document.getElementById("busca").value;
+      const status = document.getElementById("status");
+      const container = document.getElementById("resultados");
+      container.innerHTML = "";
+      status.innerText = "Buscando ranking para: " + termo;
+
+      try {
+        const res = await fetch("/api/rank?q=" + termo);
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error();
+
+        container.innerHTML = data.map(anuncio => `
+          <div class="card">
+            <img src="${anuncio.imagem}" alt="Imagem do produto"/>
+            <strong>${anuncio.titulo}</strong><br/>
+            <b>Preço:</b> R$ ${anuncio.preco} | <b>Vendas:</b> ${anuncio.vendas}<br/>
+            <b>Tipo:</b> ${anuncio.tipo} | <b>Entrega:</b> ${anuncio.entrega}<br/>
+            <b>Catálogo:</b> ${anuncio.catalogo} | <b>Medalha:</b> ${anuncio.medalha}<br/>
+            <b>Criado em:</b> ${anuncio.criado}<br/>
+            <a href="${anuncio.link}" target="_blank">Ver anúncio</a>
+          </div>
+        `).join("");
+      } catch {
+        status.innerText = "Erro ao buscar os dados.";
+      }
+    }
+  </script>
+</body>
+</html>
