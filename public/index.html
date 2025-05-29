@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ranking de Anúncios (Top 50)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .search-box {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .card {
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .card p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .card a {
+      display: inline-block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: #2980b9;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ranking de Anúncios (Top 50)</h1>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Digite o nome do produto"/>
+    <button onclick="buscarRanking()">Buscar Ranking</button>
+  </div>
+  <div id="resultado" class="grid"></div>
+
+  <script>
+    function buscarRanking() {
+      const termo = document.getElementById('searchInput').value;
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = '';
+      fetch('/api/ranking?produto=' + encodeURIComponent(termo))
+        .then(res => res.json())
+        .then(data => {
+          data.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <h2>${index + 1}º - ${item.titulo}</h2>
+              <p><strong>Preço:</strong> R$ ${item.preco} | <strong>Vendas:</strong> ${item.vendas}</p>
+              <p><strong>Tipo:</strong> ${item.tipo} | <strong>Entrega:</strong> ${item.entrega}</p>
+              <p><strong>Catálogo:</strong> ${item.catalogo} | <strong>Medalha:</strong> ${item.medalha}</p>
+              <p><strong>Criado em:</strong> ${item.data}</p>
+              <a href="${item.link}" target="_blank">Ver anúncio</a>
+            `;
+            resultado.appendChild(card);
+          });
+        });
+    }
+  </script>
+</body>
+</html>
