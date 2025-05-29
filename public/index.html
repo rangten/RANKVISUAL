@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Ranking de Anúncios (Top 50)</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
+    h1 { text-align: center; }
+    .search-bar { text-align: center; margin-bottom: 20px; }
+    .search-bar input { width: 300px; padding: 10px; font-size: 16px; }
+    .search-bar button { padding: 10px 15px; font-size: 16px; background: #007bff; color: white; border: none; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+    .card img { width: 100%; max-width: 200px; display: block; margin: 0 auto 10px; }
+    .card a { color: #007bff; text-decoration: none; font-weight: bold; }
+    .meta { font-size: 14px; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>Ranking de Anúncios (Top 50)</h1>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Digite o nome do produto">
+    <button onclick="buscarRanking()">Buscar Ranking</button>
+  </div>
+  <div id="resultado" class="grid"></div>
+
+  <script>
+    async function buscarRanking() {
+      const termo = document.getElementById('search').value;
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = '<p>Buscando ranking para: <b>' + termo + '</b></p>';
+      const res = await fetch('/api/search?q=' + encodeURIComponent(termo));
+      const data = await res.json();
+      resultado.innerHTML = '';
+      data.forEach(produto => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = \`
+          <img src="\${produto.thumbnail}" alt="Imagem do produto">
+          <div class="meta">\${produto.title}</div>
+          <div class="meta">Preço: R$ \${produto.price} | Vendas: \${produto.sold_quantity}</div>
+          <div class="meta">Tipo: \${produto.listing_type_id} | Entrega: \${produto.shipping}</div>
+          <div class="meta">Catálogo: \${produto.catalog_listing}</div>
+          <div class="meta">Criado em: \${new Date(produto.date_created).toLocaleDateString()}</div>
+          <a href="\${produto.permalink}" target="_blank">Ver anúncio</a>
+        \`;
+        resultado.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
